@@ -74,8 +74,14 @@ sudo journalctl -u moode-oled.service -f
 # Activate the virtual environment
 source ~/MoodeAudio-OLED/.venv/bin/activate
 
-# Run manually for testing
+# Test MoodeAudio API (recommended first)
+python test_moode_api.py
+
+# Run standard mode (MPD only)
 python -m moode_oled.main
+
+# Run enhanced mode (all sources including Spotify/Bluetooth) ⭐
+python -m moode_oled.main_enhanced
 ```
 
 ## Configuration
@@ -127,26 +133,38 @@ ruff check src/
 mypy src/
 ```
 
-## Understanding Audio Sources
+## ✨ Enhanced Multi-Source Support
 
-MoodeAudio supports multiple audio sources, but **only MPD-based sources** will show track information on the OLED display:
+This modernized version supports **ALL MoodeAudio sources** including Spotify and Bluetooth!
 
-### ✅ **Works with OLED Display**
-- Local music library
-- Internet radio streams  
-- UPnP/DLNA content
-- Music files played through MPD
+### 🎯 **Two Display Modes Available**
 
-### ❌ **Limited Display Support**
-- **Spotify Connect**: Bypasses MPD, may show "stop" or connection errors
-- **Bluetooth**: May not report track metadata through MPD
-- **Airplay**: Typically bypasses MPD entirely
+#### **Standard Mode** (MPD only)
+- Uses traditional MPD connection
+- Works with: Local files, Internet radio, UPnP/DLNA
+- Run with: `python -m moode_oled.main`
 
-### 💡 **Workaround for Spotify**
-If you want Spotify metadata on the display, use:
-1. **Spotify Premium** with a music management app that adds tracks to MPD
-2. **librespot** configured to integrate with MPD
-3. Alternative: Use internet radio streams or local files for OLED display functionality
+#### **Enhanced Mode** (All sources) ⭐
+- Uses MoodeAudio's REST API + MPD fallback  
+- Works with: **Everything above PLUS Spotify Connect, Bluetooth, AirPlay**
+- Run with: `python -m moode_oled.main_enhanced`
+
+### ✅ **Enhanced Mode Support**
+- **Spotify Connect**: Full track metadata ✅
+- **Bluetooth**: Track info when available ✅
+- **AirPlay**: Track metadata ✅
+- **Local music library**: Full metadata ✅
+- **Internet radio**: Station and track info ✅
+- **UPnP/DLNA**: Full metadata ✅
+
+### ⚙️ **Setup for Enhanced Mode**
+
+Enable metadata file in MoodeAudio:
+1. Go to **Configure** → **Audio** → **General**
+2. Set **Metadata file** to **ON**
+3. Click **APPLY**
+
+Then use the enhanced version for all audio sources!
 
 ## Troubleshooting
 
@@ -169,12 +187,23 @@ The display now automatically reconnects to MPD if the connection is lost. If yo
 2. Check file permissions in project directory
 
 ### Audio Source Debugging
-Use the included debug script to understand what MPD sees:
+Use the included debug scripts:
 ```bash
 cd ~/MoodeAudio-OLED
 source .venv/bin/activate
+
+# Test MoodeAudio API (for Spotify/Bluetooth)
+python test_moode_api.py
+
+# Test MPD connection (for local files/radio)
 python debug_mpd.py
 ```
+
+### Spotify/Bluetooth Not Working
+1. Ensure "Metadata file" is enabled in MoodeAudio Audio Config
+2. Run `python test_moode_api.py` to verify API access
+3. Use enhanced mode: `python -m moode_oled.main_enhanced`
+4. Check that `/var/local/www/currentsong.txt` exists and updates
 
 ## Migration from Old Version
 
