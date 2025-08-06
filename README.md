@@ -74,14 +74,20 @@ sudo journalctl -u moode-oled.service -f
 # Activate the virtual environment
 source ~/MoodeAudio-OLED/.venv/bin/activate
 
-# Test MoodeAudio API (recommended first)
+# Test LCD update engine setup
+python setup_lcd_engine.py
+
+# Test MoodeAudio API (for debugging)
 python test_moode_api.py
 
 # Run standard mode (MPD only)
 python -m moode_oled.main
 
-# Run enhanced mode (all sources including Spotify/Bluetooth) ⭐
+# Run enhanced mode (all sources, continuous)
 python -m moode_oled.main_enhanced
+
+# Run LCD updater once (used by MoodeAudio)
+python -m moode_oled.main_lcd
 ```
 
 ## Configuration
@@ -157,14 +163,29 @@ This modernized version supports **ALL MoodeAudio sources** including Spotify an
 - **Internet radio**: Station and track info ✅
 - **UPnP/DLNA**: Full metadata ✅
 
-### ⚙️ **Setup for Enhanced Mode**
+### ⚙️ **Setup for All Audio Sources (Recommended)**
 
-Enable metadata file in MoodeAudio:
-1. Go to **Configure** → **Audio** → **General**
-2. Set **Metadata file** to **ON**
-3. Click **APPLY**
+**Use MoodeAudio's LCD Update Engine** - This automatically triggers on track changes for ALL sources:
 
-Then use the enhanced version for all audio sources!
+1. **Run the setup helper:**
+   ```bash
+   cd ~/MoodeAudio-OLED
+   python setup_lcd_engine.py
+   ```
+
+2. **Configure in MoodeAudio:**
+   - Go to **Configure** → **System** → **Local Services**
+   - Find **LCD update engine** 
+   - Use the script path from the setup helper
+   - Enable the LCD update engine
+   - Click **APPLY**
+
+3. **Optional: Enable metadata file (if available)**
+   - Go to **Configure** → **Audio** → **General**
+   - Look for **Metadata file** and set to **ON** 
+   - Click **APPLY**
+
+✨ **This method automatically displays metadata from ALL sources including Spotify and Bluetooth!**
 
 ## Troubleshooting
 
