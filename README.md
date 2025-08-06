@@ -1,30 +1,163 @@
-# MoodeAudio-OLED
-OLED 128x64 for MoodeAudio
+# MoodeAudio OLED Display (2025 Edition)
 
-![ScreenShot](https://github.com/naisema/MoodeAudio-OLED/blob/developer/OLED%20128x64.jpg?raw=true "OLED 128x64 Display")
-<br />
-Let see on Youtube <br />
-[![OLED 128x64 Display](https://img.youtube.com/vi/ZFla1naHdzA/0.jpg)](https://www.youtube.com/watch?v=ZFla1naHdzA "OLED 126x64 Display")
-<br />
+Modern OLED display integration for MoodeAudio 9.x running on Raspberry Pi OS Bookworm.
 
-Installation
+![OLED Display](OLED%20128x64.jpg)
 
-1. Login to MoodeAudio with user pi and password moodeaudio
-2. Ran raspi-config and enabled i2c
-3. Prerequites <br />
-   $ sudo apt-get update <br />
-   $ sudo apt-get install build-essential python-pip python-dev python-smbus git python-imaging python-mpd<br />
-4. Adafruit Python GPIO Library <br />
-   $ git clone https://github.com/adafruit/Adafruit_Python_GPIO.git <br />
-   $ cd Adafruit_Python_GPIO <br />
-   $ sudo python setup.py install <br />
-5. Adafruit Python SSD1306 <br />
-   $ git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git <br />
-   $ cd Adafruit_Python_SSD1306 <br />
-   $ sudo python setup.py install <br />
-6. Download python script from github <br />
-   $ git clone https://github.com/naisema/MoodeAudio-OLED.git <br />
-7. Go to MoodAudio UI menu -> Configure -> System -> Local Services -> LCD update engine
-   fille full path of python script. On button and apply SET <br />
-   ![ScreenShot](https://github.com/naisema/MoodeAudio-OLED/blob/developer/Python_LCD_setup.jpg?raw=true "Python LCD setup")
-8. Display can show song information
+## Features
+
+- 🎵 Real-time display of current playing track
+- 📊 Shows artist, title, audio format, elapsed time, and volume
+- 🔄 Auto-scrolling for long text
+- 🚀 Modern Python 3.11+ with type hints and logging
+- ⚡ Fast dependency management with uv
+- 🔒 Secure systemd service with resource limits
+- 🔌 Plug-and-play with MoodeAudio 9.2.6
+
+## Supported Hardware
+
+- **Raspberry Pi**: Zero 2 W, 3, 4, 5 (tested on Zero 2 W)
+- **Display**: SSD1306 128x64 OLED (I2C)
+- **OS**: Raspberry Pi OS Bookworm 64-bit
+- **MoodeAudio**: Version 9.2.6 or later
+
+## Quick Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/joho/MoodeAudio-OLED.git
+cd MoodeAudio-OLED
+
+# Run the automated installer
+chmod +x install.sh
+./install.sh
+```
+
+The installer will:
+- ✅ Install uv package manager
+- ✅ Set up Python virtual environment
+- ✅ Install all dependencies
+- ✅ Configure systemd service
+- ✅ Set up hardware permissions
+
+## Hardware Wiring
+
+Connect your SSD1306 OLED display to the Raspberry Pi:
+
+| OLED Pin | RPi Pin | RPi GPIO |
+|----------|---------|----------|
+| VCC      | Pin 1   | 3.3V     |
+| GND      | Pin 6   | Ground   |
+| SDA      | Pin 3   | GPIO 2   |
+| SCL      | Pin 5   | GPIO 3   |
+
+## Usage
+
+### Starting the Service
+
+```bash
+# Start the service
+sudo systemctl start moode-oled.service
+
+# Check status
+sudo systemctl status moode-oled.service
+
+# View live logs
+sudo journalctl -u moode-oled.service -f
+```
+
+### Manual Testing
+
+```bash
+# Activate the virtual environment
+source ~/MoodeAudio-OLED/.venv/bin/activate
+
+# Run manually for testing
+python -m moode_oled.main
+```
+
+## Configuration
+
+### Enable I2C (if not already enabled)
+
+```bash
+sudo raspi-config
+```
+Navigate to: `Interfacing Options` → `I2C` → `Enable`
+
+### Speed up I2C (optional)
+
+For better performance, add to `/boot/firmware/config.txt`:
+```
+dtparam=i2c_baudrate=1000000
+```
+
+## Development
+
+### Prerequisites
+- Python 3.11+
+- uv package manager
+
+### Setup Development Environment
+
+```bash
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment
+uv venv .venv --python 3.11
+source .venv/bin/activate
+
+# Install in development mode
+uv pip install -e ".[dev]"
+```
+
+### Code Quality
+
+```bash
+# Format code
+black src/
+
+# Lint code
+ruff check src/
+
+# Type checking
+mypy src/
+```
+
+## Troubleshooting
+
+### Display Not Working
+1. Check I2C is enabled: `sudo i2cdetect -y 1`
+2. Verify wiring connections
+3. Check service logs: `sudo journalctl -u moode-oled.service`
+
+### MPD Connection Issues
+1. Ensure MoodeAudio is running
+2. Check MPD status: `sudo systemctl status mpd`
+3. Test MPD connection: `telnet localhost 6600`
+
+### Permission Errors
+1. Ensure user is in gpio group: `groups pi`
+2. Check file permissions in project directory
+
+## Migration from Old Version
+
+If upgrading from the original Python 2.7 version:
+
+1. Stop the old service: `sudo systemctl stop moode-oled`
+2. Remove old files and dependencies
+3. Follow the installation steps above
+4. The new version uses different font paths and library imports
+
+**Note**: The installer automatically detects your current user, so it works with any username (not just 'pi').
+
+## License
+
+MIT License - see original project for attribution.
+
+## Credits
+
+- Original project by Suwat Saisema
+- Modernized for 2025 with current best practices
+- Uses Adafruit CircuitPython libraries

@@ -1,26 +1,25 @@
-# MoodeAudio-OLED Agent Configuration
+# MoodeAudio-OLED Agent Configuration (2025 Edition)
 
 ## Architecture
-Single Python script (`moode-oled.py`) that displays MoodeAudio player information on 128x64 OLED display using Adafruit SSD1306 library. Connects to MPD (Music Player Daemon) via localhost:6600 to fetch current song data.
+Modern Python 3.11+ package with proper structure. Main module `src/moode_oled/display.py` contains OLED display logic and MPD client. Uses CircuitPython libraries for hardware access and python-mpd2 for MPD communication.
 
 ## Dependencies & Setup
-- Manual installation required: Adafruit Python GPIO + SSD1306 libraries, python-mpd, PIL/Pillow
-- Hardware: Raspberry Pi with I2C enabled, SSD1306 OLED display on GPIO pins 23/24
-- Service: Run via systemd service or MoodeAudio's LCD update engine
+- uv package manager for fast dependency resolution
+- Python 3.11+ with type hints and modern features
+- Dependencies: adafruit-circuitpython-ssd1306, python-mpd2, pillow, RPi.GPIO
+- Hardware: Raspberry Pi with I2C enabled, SSD1306 OLED display
 
-## File Structure
-- `moode-oled.py`: Main display script with MPD client and OLED rendering
-- `moode-oled.service`: systemd service file
-- `*.ttf`: Font files (Arial-Unicode, Verdana) for display rendering
+## Commands
+- Install: `./install.sh` (automated installer)
+- Dev setup: `uv venv .venv && uv pip install -e ".[dev]"`
+- Run: `python -m moode_oled.main` (from venv)
+- Service: `sudo systemctl start moode-oled.service`
+- Logs: `sudo journalctl -u moode-oled.service -f`
+- Format: `black src/` | Lint: `ruff check src/` | Types: `mypy src/`
 
 ## Code Style
-- Python 2.7 style (uses `reload(sys)`, `unicode()`)
-- Mixed indentation (tabs/spaces) - use existing style
-- Classes: CamelCase (e.g., `MPDConnect`)
-- Variables: snake_case
-- No type hints or modern Python features
-
-## Running/Testing
-- Test: `python moode-oled.py` (requires hardware)
-- Service: `sudo systemctl start moode-oled.service`
-- No unit tests - hardware-dependent display script
+- Python 3.11+ with type hints (all functions typed)
+- Classes: CamelCase | Variables/functions: snake_case
+- 88 char line length | Black formatting | Ruff linting
+- Logging instead of print statements | Proper error handling
+- Use pathlib.Path for file operations
