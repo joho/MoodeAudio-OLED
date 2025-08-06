@@ -52,12 +52,28 @@ sudo apt-get install -y python3-dev python3-setuptools
 echo "⚡ Installing uv package manager..."
 if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    # Add uv to PATH for current session
-    export PATH="$HOME/.cargo/bin:$PATH"
-    # Source bashrc to ensure uv is available
-    if [ -f "$HOME/.bashrc" ]; then
-        source "$HOME/.bashrc" || true
+    
+    # Source the uv environment to add it to PATH for current session
+    if [ -f "$HOME/.local/bin/env" ]; then
+        echo "🔧 Adding uv to PATH for current session..."
+        source "$HOME/.local/bin/env"
+    elif [ -f "$HOME/.cargo/bin/uv" ]; then
+        # Fallback for older installation method
+        export PATH="$HOME/.cargo/bin:$PATH"
+    else
+        echo "❌ uv installation completed but cannot find uv binary"
+        echo "Please restart your shell and run this script again"
+        exit 1
     fi
+    
+    # Verify uv is now available
+    if ! command -v uv &> /dev/null; then
+        echo "❌ uv is still not available after installation"
+        echo "Please restart your shell and run this script again"
+        exit 1
+    fi
+    
+    echo "✅ uv is now available in PATH"
 fi
 
 # Set up project directory

@@ -31,7 +31,8 @@ class MPDConnect:
         if not self._mpd_connected:
             try:
                 self._mpd_client.ping()
-            except (socket_error, ConnectionError):
+                self._mpd_connected = True
+            except (socket_error, ConnectionError, CommandError):
                 try:
                     self._mpd_client.connect(self._host, self._port)
                     self._mpd_connected = True
@@ -39,6 +40,23 @@ class MPDConnect:
                 except (socket_error, ConnectionError, CommandError) as e:
                     self._mpd_connected = False
                     logger.error(f"Failed to connect to MPD: {e}")
+
+    def _ensure_connected(self) -> bool:
+        """Ensure MPD connection is active, reconnect if needed."""
+        if not self._mpd_connected:
+            self.connect()
+            return self._mpd_connected
+            
+        try:
+            # Test connection with ping
+            self._mpd_client.ping()
+            return True
+        except (socket_error, ConnectionError, CommandError, MPDError) as e:
+            logger.warning(f"MPD connection lost: {e}")
+            self._mpd_connected = False
+            # Try to reconnect
+            self.connect()
+            return self._mpd_connected
 
     def disconnect(self) -> None:
         """Disconnect from MPD server."""
@@ -52,6 +70,17 @@ class MPDConnect:
 
     def fetch(self) -> Dict[str, str]:
         """Fetch current song and player status from MPD."""
+        # Ensure we have a valid connection
+        if not self._ensure_connected():
+            return {
+                "state": "error",
+                "artist": "MPD Disconnected",
+                "title": "Retrying...",
+                "eltime": "0:00:00",
+                "volume": 0,
+                "audio_info": "",
+            }
+        
         try:
             # Get current song info
             song_info = self._mpd_client.currentsong()
@@ -92,6 +121,20 @@ class MPDConnect:
             # Get volume
             volume = int(song_stats.get("volume", 0))
             
+            # Debug logging for state changes and detailed info
+            if hasattr(self, '_last_state') and self._last_state != state:
+                logger.info(f"MPD state changed: {self._last_state} -> {state}")
+            self._last_state = state
+            
+            # Debug log current song info periodically (every 30 seconds)
+            if not hasattr(self, '_debug_counter'):
+                self._debug_counter = 0
+            self._debug_counter += 1
+            if self._debug_counter % 30 == 0:
+                logger.info(f"MPD Status - State: {state}, Artist: {artist}, Title: {title}, Audio: {audio_info}")
+                logger.debug(f"Raw MPD currentsong: {song_info}")
+                logger.debug(f"Raw MPD status: {song_stats}")
+            
             return {
                 "state": state,
                 "artist": artist,
@@ -101,12 +144,23 @@ class MPDConnect:
                 "audio_info": audio_info,
             }
             
-        except Exception as e:
+        except (socket_error, ConnectionError, CommandError, MPDError) as e:
             logger.error(f"Error fetching MPD data: {e}")
+            self._mpd_connected = False
             return {
                 "state": "error",
                 "artist": "Connection Error",
-                "title": "Check MPD",
+                "title": "Reconnecting...",
+                "eltime": "0:00:00",
+                "volume": 0,
+                "audio_info": "",
+            }
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
+            return {
+                "state": "error",
+                "artist": "System Error",
+                "title": str(e)[:20] + "...",
                 "eltime": "0:00:00",
                 "volume": 0,
                 "audio_info": "",
@@ -260,8 +314,25 @@ class MoodeOLEDApp:
             self.mpd_client.connect()
             
             while self.running:
-                info = self.mpd_client.fetch()
-                self.display.update_display(info)
+                try:
+                    info = self.mpd_client.fetch()
+                    self.display.update_display(info)
+                except Exception as e:
+                    logger.error(f"Error in main loop: {e}")
+                    # Show error on display but continue running
+                    error_info = {
+                        "state": "error",
+                        "artist": "System Error",
+                        "title": "Check logs",
+                        "eltime": "0:00:00",
+                        "volume": 0,
+                        "audio_info": "",
+                    }
+                    try:
+                        self.display.update_display(error_info)
+                    except Exception:
+                        pass  # If display update fails, just continue
+                
                 time.sleep(1)
                 
         except KeyboardInterrupt:

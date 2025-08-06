@@ -1,14 +1,15 @@
 [project]
 name = "moode-oled"
 version = "2.0.0"
-description = "Modern OLED display integration for MoodeAudio 9.x"
+description = "Modern OLED display integration for MoodeAudio 9.x (modernized fork of naisema/MoodeAudio-OLED)"
 authors = [
-    {name = "Original: Suwat Saisema"},
-    {name = "Modernized: Updated for 2025"}
+    {name = "Suwat Saisema", email = "suwat.saisema@gmail.com"},
+    {name = "Modernized for 2025"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.9"
+homepage = "https://github.com/naisema/MoodeAudio-OLED"
 dependencies = [
     "adafruit-circuitpython-ssd1306>=2.0.0",
     "python-mpd2>=3.1.0",

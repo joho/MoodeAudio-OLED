@@ -127,6 +127,27 @@ ruff check src/
 mypy src/
 ```
 
+## Understanding Audio Sources
+
+MoodeAudio supports multiple audio sources, but **only MPD-based sources** will show track information on the OLED display:
+
+### ✅ **Works with OLED Display**
+- Local music library
+- Internet radio streams  
+- UPnP/DLNA content
+- Music files played through MPD
+
+### ❌ **Limited Display Support**
+- **Spotify Connect**: Bypasses MPD, may show "stop" or connection errors
+- **Bluetooth**: May not report track metadata through MPD
+- **Airplay**: Typically bypasses MPD entirely
+
+### 💡 **Workaround for Spotify**
+If you want Spotify metadata on the display, use:
+1. **Spotify Premium** with a music management app that adds tracks to MPD
+2. **librespot** configured to integrate with MPD
+3. Alternative: Use internet radio streams or local files for OLED display functionality
+
 ## Troubleshooting
 
 ### Display Not Working
@@ -138,10 +159,22 @@ mypy src/
 1. Ensure MoodeAudio is running
 2. Check MPD status: `sudo systemctl status mpd`
 3. Test MPD connection: `telnet localhost 6600`
+4. Run debug script: `python debug_mpd.py`
+
+### Connection Drops
+The display now automatically reconnects to MPD if the connection is lost. If you see "Reconnecting..." messages, this is normal behavior.
 
 ### Permission Errors
-1. Ensure user is in gpio group: `groups pi`
+1. Ensure user is in gpio group: `groups`
 2. Check file permissions in project directory
+
+### Audio Source Debugging
+Use the included debug script to understand what MPD sees:
+```bash
+cd ~/MoodeAudio-OLED
+source .venv/bin/activate
+python debug_mpd.py
+```
 
 ## Migration from Old Version
 
