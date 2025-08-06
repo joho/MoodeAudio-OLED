@@ -74,8 +74,8 @@ sudo journalctl -u moode-oled.service -f
 # Activate the virtual environment
 source ~/MoodeAudio-OLED/.venv/bin/activate
 
-# Test LCD update engine setup
-python setup_lcd_engine.py
+# Install system dependencies and LCD wrapper (recommended)
+python install_system_deps.py
 
 # Test MoodeAudio API (for debugging)
 python test_moode_api.py
@@ -86,8 +86,8 @@ python -m moode_oled.main
 # Run enhanced mode (all sources, continuous)
 python -m moode_oled.main_enhanced
 
-# Run LCD updater once (used by MoodeAudio)
-python -m moode_oled.main_lcd
+# Test LCD updater manually
+sudo python3 /var/local/www/commandw/lcd-updater.py
 ```
 
 ## Configuration
@@ -165,19 +165,17 @@ This modernized version supports **ALL MoodeAudio sources** including Spotify an
 
 ### ⚙️ **Setup for All Audio Sources (Recommended)**
 
-**Use MoodeAudio's LCD Update Engine** - This automatically triggers on track changes for ALL sources:
+**System-wide install with lightweight wrapper** - Fast execution, works with ALL sources:
 
-1. **Run the setup helper:**
+1. **Install system dependencies and wrapper:**
    ```bash
    cd ~/MoodeAudio-OLED
-   python setup_lcd_engine.py
+   python install_system_deps.py
    ```
 
-2. **Configure in MoodeAudio:**
+2. **Enable in MoodeAudio:**
    - Go to **Configure** → **System** → **Local Services**
-   - Find **LCD update engine** 
-   - Use the script path from the setup helper
-   - Enable the LCD update engine
+   - Enable **LCD update engine** (toggle the switch)
    - Click **APPLY**
 
 3. **Optional: Enable metadata file (if available)**
@@ -185,7 +183,12 @@ This modernized version supports **ALL MoodeAudio sources** including Spotify an
    - Look for **Metadata file** and set to **ON** 
    - Click **APPLY**
 
-✨ **This method automatically displays metadata from ALL sources including Spotify and Bluetooth!**
+✨ **Automatically displays metadata from ALL sources including Spotify and Bluetooth!**
+
+The installer:
+- Uses `apt` packages where possible, `pip --break-system-packages` where needed
+- Creates a fast wrapper script that calls back to your git repo
+- Allows easy iteration on the code without reinstalling
 
 ## Troubleshooting
 
