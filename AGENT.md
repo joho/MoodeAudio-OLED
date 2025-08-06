@@ -1,5 +1,8 @@
 # MoodeAudio-OLED Agent Configuration (2025 Edition)
 
+## Project Context
+This is a modernized fork of naisema/MoodeAudio-OLED, updated for 2025 with Python 3.11+, modern packaging, and current best practices. The original project was created by Suwat Saisema for Python 2.7 and older hardware libraries.
+
 ## Architecture
 Modern Python 3.11+ package with proper structure. Main module `src/moode_oled/display.py` contains OLED display logic and MPD client. Uses CircuitPython libraries for hardware access and python-mpd2 for MPD communication.
 

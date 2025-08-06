@@ -2,6 +2,8 @@
 
 Modern OLED display integration for MoodeAudio 9.x running on Raspberry Pi OS Bookworm.
 
+> **Note**: This is a modernized fork of [naisema/MoodeAudio-OLED](https://github.com/naisema/MoodeAudio-OLED), updated for 2025 with Python 3.11+, modern packaging, and current best practices.
+
 ![OLED Display](OLED%20128x64.jpg)
 
 ## Features
@@ -25,7 +27,7 @@ Modern OLED display integration for MoodeAudio 9.x running on Raspberry Pi OS Bo
 
 ```bash
 # Clone the repository
-git clone https://github.com/joho/MoodeAudio-OLED.git
+git clone https://github.com/naisema/MoodeAudio-OLED.git
 cd MoodeAudio-OLED
 
 # Run the automated installer
@@ -158,6 +160,7 @@ MIT License - see original project for attribution.
 
 ## Credits
 
-- Original project by Suwat Saisema
-- Modernized for 2025 with current best practices
-- Uses Adafruit CircuitPython libraries
+- **Original project**: [naisema/MoodeAudio-OLED](https://github.com/naisema/MoodeAudio-OLED) by Suwat Saisema
+- **Modernization**: Updated for 2025 with current best practices
+- **Libraries**: Uses Adafruit CircuitPython libraries
+- **License**: MIT License (maintained from original)
